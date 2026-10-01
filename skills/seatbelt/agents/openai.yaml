@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cognitive Seatbelt"
+  short_description: "Keep human understanding in the loop during agent work"
+  default_prompt: "Use $seatbelt standard --adaptive while working on this task, checking my understanding at meaningful decisions."
