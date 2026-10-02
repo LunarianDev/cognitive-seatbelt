@@ -1,17 +1,21 @@
 ---
 name: seatbelt
-description: Preserve human understanding during agent work when the user invokes $seatbelt, asks for Cognitive Seatbelt, or requests comprehension checkpoints or guided reasoning while delegating a task. Supports independent cognitive modes and communication flags. Ordinary requests for brevity or task approval alone do not activate this protocol.
+description: Preserves human understanding during delegated agent work through alignment and comprehension checkpoints. Use when the user invokes seatbelt (such as $seatbelt or /seatbelt), asks for Cognitive Seatbelt, or requests guided reasoning while delegating a task. Ordinary requests for brevity or task approval alone do not activate this protocol.
 ---
 
 # Cognitive Seatbelt
 
 Let the agent absorb execution effort while the human retains understanding of goals, decisions, tradeoffs, and outcomes. Add this protocol to the user's actual task; do not replace that task with a general interview. This is an instructions-only skill: checkpoints are conversational behavior, not runtime tool barriers or a guarantee of learning.
 
+This skill is self-contained: neither Grill-Me (Grilling) nor Caveman needs to be installed or activated. No scripts, packages, network access, or specific question tool are required. Resolve bundled reference paths relative to this skill's directory. If a reference is unavailable, report the missing file and use the checkpoint rules in this entrypoint; do not fetch another skill or invent reference contents.
+
 ## Invocation and two independent controls
 
 ```text
 $seatbelt [off|lite|standard|strict|mentor] [--normal|--compact|--caveman|--adaptive] <task>
 ```
+
+Use the host's invocation mechanism: `$seatbelt` in Codex, `/seatbelt` in Claude Code, or a natural-language request such as "Use Cognitive Seatbelt in strict mode with compact communication for this task." All forms use the same controls. When the host supplies invocation arguments separately, interpret those arguments as the controls and task. These are model instructions, not executable commands; no host-specific argument placeholder is required.
 
 Examples:
 
@@ -23,13 +27,15 @@ $seatbelt --compact
 $seatbelt off
 ```
 
-First activation defaults to `standard --adaptive`. Later invocations change only explicitly supplied settings; bare `$seatbelt` retains the active settings. Switching cognitive mode never changes communication style, and changing a communication flag never changes cognitive mode. `off` disables Seatbelt questions while retaining the communication setting; `off --normal` returns both controls to ordinary behavior.
+First activation defaults to `standard --adaptive`. Later invocations change only explicitly supplied settings; a bare invocation retains the active settings. Switching cognitive mode never changes communication style, and changing a communication flag never changes cognitive mode. `off` disables Seatbelt questions while retaining the communication setting; `off --normal` returns both controls to ordinary behavior.
 
 Read controls adjacent to the invocation, not flags appearing inside quoted material, code, or the task's own commands. For repeated settings on one axis, the last supplied value wins; briefly state the resolved settings. If a control is unknown, identify it and clarify rather than invent a mode or start gated execution under an assumed setting.
 
-`$seatbelt --help` shows syntax, modes, flags, and defaults. `$seatbelt --status` reports the current settings and any pending checkpoint, or reports inactive if it has never been activated in this chat. These are informational commands: they do not activate, reset, or release a checkpoint, and need not start task work.
+`--help` with the host's Seatbelt invocation shows syntax, modes, flags, and defaults. `--status` reports the current settings and any pending checkpoint, or reports inactive if it has never been activated in this chat. If prior state may have been lost, report it as unknown instead of inactive. These are informational commands: they do not activate, reset, or release a checkpoint, and need not start task work.
 
 Keep settings and pending checkpoints in this chat's context, including a handoff summary when available. Associate each checkpoint with its task and decision; retire it if the user cancels or replaces that task, while retaining the two settings. Do not write global preferences, alter another skill, or infer settings from unrelated chats. On activation or a change, acknowledge the effective mode and communication setting in one short line. Do not repeat the banner on every response.
+
+Before a context handoff, preserve the effective mode and communication setting plus any pending checkpoint's task, boundary, question, essential idea, and attempt count. If a continuing task has lost its settings or pending checkpoint state, consult available history or its handoff summary. If still unavailable, state what is unknown and ask the user to restore the settings or resolve the boundary before dependent execution. Do not assume a checkpoint passed or silently reset an active protocol to defaults. A genuinely fresh activation still uses the defaults.
 
 ## Cognitive modes
 
@@ -71,6 +77,8 @@ Finish enough discovery and preparation to make the decision concrete and review
 5. At the handoff of substantial work, report the actual result and validation first. Standard can request a brief summary; Strict or Mentor can ask for one sentence capturing what changed and a relevant consequence. If this final checkpoint is pending, state that execution is finished and the handoff check remains; never misrepresent completed work or unrun checks.
 
 Use a supported question tool when suitable, otherwise ask in chat and yield. Never treat a tool's preselected option, silence, or elapsed time as an answer. For comprehension quizzes, avoid answer options marked "recommended" or any default that reveals the answer; use a free-text tool question or plain chat options if necessary.
+
+In a noninteractive or one-shot harness, when a checkpoint requires a reply that cannot arrive during the run, return the question, pending boundary, effective settings, and any completed independent work for a human to resume. Stop dependent execution at that boundary; do not fabricate an answer, wait indefinitely, or silently lower the mode. At a final handoff checkpoint, report completed execution and the remaining check separately. Explicit user instructions to skip a checkpoint or turn Seatbelt off still apply.
 
 ## User agency and permissions
 
