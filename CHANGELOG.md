@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 - 2026-11-04
 
 ### Added
 
@@ -23,4 +23,4 @@
 - Claude Code disclosed a missing reference late in one of three focused attempts, despite preserving the core checkpoint boundary.
 - Complete pending settings appeared in the full one-shot output streams on both hosts; final-message-only output omitted the communication setting.
 
-See the [trial report](docs/trials/2026-11-04/README.md) for exact configurations, revision coverage, and remaining gaps. These are small observed samples, not reliability or learning measurements. No release has been published yet.
+See the [trial report](docs/trials/2026-11-04/README.md) for exact configurations, revision coverage, and remaining gaps. These are small observed samples, not reliability or learning measurements. The [v0.1.0 release](https://github.com/LunarianDev/cognitive-seatbelt/releases/tag/v0.1.0) includes the installable skill archive and checksum.

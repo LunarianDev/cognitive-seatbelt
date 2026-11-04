@@ -2,7 +2,7 @@
 
 These local Codex CLI and Claude Code trials support an early v0.1.0 candidate with known limitations. The broader-rule revision held production edits, restored missing continuation state, and distinguished answered checkpoints from skips in the recorded cases. The final disclosure revision passed Codex's three focused B13 attempts; Claude disclosed the missing reference on time twice and late once. That third attempt remains a disclosure-timing failure.
 
-These are small observed samples, not reliability estimates or evidence of learning or token savings. No release is published by this report.
+These are small observed samples, not reliability estimates or evidence of learning or token savings. Publication status and packaged files are recorded on the [v0.1.0 release page](https://github.com/LunarianDev/cognitive-seatbelt/releases/tag/v0.1.0).
 
 ## Tested configurations
 
