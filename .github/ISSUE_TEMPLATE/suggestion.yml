@@ -1,0 +1,21 @@
+name: Suggestion or task feedback
+description: Share a real use case, helpful checkpoint, documentation problem, or improvement.
+title: "[Feedback]: "
+body:
+  - type: markdown
+    attributes:
+      value: Share only sanitized examples. Exclude private code, credentials, personal data, and client information.
+  - type: textarea
+    id: task
+    attributes:
+      label: What were you trying to do?
+      description: Describe the task and, if relevant, the host, model, and Seatbelt settings.
+    validations:
+      required: true
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What helped or needs to improve?
+      description: Explain the problem or useful behavior. Include a concrete example and a proposed change if you have one.
+    validations:
+      required: true
