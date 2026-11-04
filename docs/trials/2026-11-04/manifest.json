@@ -1,0 +1,225 @@
+{
+  "record_date": "2026-11-04",
+  "timezone": "America/Los_Angeles",
+  "base_commit_during_trials": "e2aeebf72265370d1e9af119a09632705f83307d",
+  "identity_note": "Trials ran before the protocol edits were committed. Skill-file hashes identify the tested bytes. The historical trial patch hash excludes the later evidence/reporting documentation added in this PR.",
+  "revisions": {
+    "original": {
+      "entry_sha256": "410a7e7f79fcade678f1bc6634291a40385c9d23aa674b953f8c3bf562e39eb7",
+      "reference_sha256": "a55035c7cd9c7ac80c38d385d1253c18471c77d74bafd82a86ba91d0ba69e9fd",
+      "coverage": "Historical failures retained in local original reports; summarized in README.md."
+    },
+    "broader_rule_candidate": {
+      "entry_sha256": "e850dd5ccfd996ed39d29760ecf14cf0bd7aead99378f26d0670c37fd4491f39",
+      "reference_sha256": "cda38be2e0397c980ddf7851f91c36bd7e6a9685b0aa775df8ead29d9a33046f",
+      "coverage": "B01-B13 with expanded variants and one actual human walkthrough on each host."
+    },
+    "disclosure_candidate": {
+      "skill_files_sha256": {
+        "agents/openai.yaml": "6f69147b1d2a8292b2c189973e4aa88dc9fe082cbfe8090da86c3a76597b7deb",
+        "LICENSE": "33dac935481fb6abe708f0a35b50144863d102cf98abec52b5e4849b7904e814",
+        "references/checkpoints.md": "cda38be2e0397c980ddf7851f91c36bd7e6a9685b0aa775df8ead29d9a33046f",
+        "SKILL.md": "52315469ddf76128cf1efe870ef80459053c81176d644d016d2c26e482c24af7"
+      },
+      "historical_trial_patch_sha256": "e2a37b692833a2d78d7239a5cb3b9b4ff3536427c734d4994ad9455570870967",
+      "coverage": "Three B13 attempts, one B03 case, and one B12 case on each host. No new human walkthrough or full matrix on this final wording.",
+      "skill_files_lf_normalized_sha256": {
+        "agents/openai.yaml": "83281e63fe0971db19e70f5c4f99ca3a1497d5969ec571f741268628e2bcb082",
+        "LICENSE": "33dac935481fb6abe708f0a35b50144863d102cf98abec52b5e4849b7904e814",
+        "references/checkpoints.md": "cda38be2e0397c980ddf7851f91c36bd7e6a9685b0aa775df8ead29d9a33046f",
+        "SKILL.md": "52315469ddf76128cf1efe870ef80459053c81176d644d016d2c26e482c24af7"
+      }
+    }
+  },
+  "hosts": [
+    {
+      "host": "Codex CLI",
+      "version": "0.166.0",
+      "primary_model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    },
+    {
+      "host": "Claude Code",
+      "version": "2.1.318",
+      "primary_model": "claude-opus-5-5",
+      "effort": "medium"
+    }
+  ],
+  "source_artifacts": [
+    {
+      "id": "codex-boundary-matrix",
+      "origin": "codex/matrix-20261104-012513/evaluations.json",
+      "sha256": "6c2afddcfdb2f491d183934d5a3c1d72a2c26e1ec6adfdea736fef7172a4f6a0",
+      "used_for": [
+        "matrix.md"
+      ]
+    },
+    {
+      "id": "claude-matrices-and-human-summary",
+      "origin": "claude/summary.md",
+      "sha256": "2c4f87557357b2762c07b638e665bbafcd9b2c444031e9a68ed6b7e13658b45b",
+      "used_for": [
+        "matrix.md",
+        "README.md"
+      ]
+    },
+    {
+      "id": "codex-human-actual",
+      "origin": "codex/transcripts/revised-walkthrough/handoff-resolution.md",
+      "sha256": "ef6e558c21ce7cd2299f5ea4d101183a78e2c430724aefb0dfecb3b4382291e1",
+      "used_for": [
+        "transcripts/codex-human.md"
+      ]
+    },
+    {
+      "id": "claude-human-actual",
+      "origin": "claude/transcripts/shareable/project-e7467f739502.md",
+      "sha256": "199e7edfadfebf62543360097907f0a526c91ad1a39cf2f5613405fc4f0a34b8",
+      "used_for": [
+        "transcripts/claude-human.md"
+      ]
+    },
+    {
+      "id": "codex-disclosure-1",
+      "origin": "codex/focused-disclosure-52315469/run-20261104-2acb9d23/transcripts/B13-attempt-1/disclosure.md",
+      "sha256": "d4da59208aa95bf8712a01483de9a498ebf461ab295bc96b9832a58fb8fbdc1d",
+      "used_for": [
+        "transcripts/codex-disclosure.md"
+      ]
+    },
+    {
+      "id": "codex-disclosure-2",
+      "origin": "codex/focused-disclosure-52315469/run-20261104-2acb9d23/transcripts/B13-attempt-2/disclosure.md",
+      "sha256": "a5956b31c7c2c101da0f4e4b36d0b225e53e20477756c3205e4a39d94bb36efd",
+      "used_for": [
+        "transcripts/codex-disclosure.md"
+      ]
+    },
+    {
+      "id": "codex-disclosure-3",
+      "origin": "codex/focused-disclosure-52315469/run-20261104-2acb9d23/transcripts/B13-attempt-3/disclosure.md",
+      "sha256": "3ca06a48bc6272a867b651823d827e77c0e043f7aca1f88b00e4b027854dd278",
+      "used_for": [
+        "transcripts/codex-disclosure.md"
+      ]
+    },
+    {
+      "id": "claude-disclosure-1",
+      "origin": "claude/focused-disclosure-52315469/run-20261104T023748-a9d48e/transcripts/B13-attempt-1-disclosure-extract.md",
+      "sha256": "f64c80ab5ce0cf4e0ccac78a70e21a73b2cb960df936aaa5aae3709fc199dc47",
+      "used_for": [
+        "transcripts/claude-disclosure.md"
+      ]
+    },
+    {
+      "id": "claude-disclosure-2",
+      "origin": "claude/focused-disclosure-52315469/run-20261104T023748-a9d48e/transcripts/B13-attempt-2-disclosure-extract.md",
+      "sha256": "622d71e22a7759323894b4d67b3528e84c20ab66ff1d2ce5c00cde834fb48af0",
+      "used_for": [
+        "transcripts/claude-disclosure.md"
+      ]
+    },
+    {
+      "id": "claude-disclosure-3",
+      "origin": "claude/focused-disclosure-52315469/run-20261104T023748-a9d48e/transcripts/B13-attempt-3-disclosure-extract.md",
+      "sha256": "b1ca13ca6d1207bb162955398949067bdbbbfeab585b347f62361660fd47896d",
+      "used_for": [
+        "transcripts/claude-disclosure.md"
+      ]
+    },
+    {
+      "id": "claude-disclosure-3-completion",
+      "origin": "claude/focused-disclosure-52315469/run-20261104T023748-a9d48e/transcripts/B13-attempt-3.md",
+      "sha256": "50d7ba100505fb45666e76cfd0aedb9f69f0bc000625bddd518c543b686b7c8f",
+      "used_for": [
+        "transcripts/claude-disclosure.md"
+      ]
+    },
+    {
+      "id": "codex-b03-turn-1",
+      "origin": "codex/focused-disclosure-52315469/run-20261104-2acb9d23/transcripts/B03/turn-01.md",
+      "sha256": "89ec8ccfd8b2cec43be1dbb50efb3258983e6570d260fb81a56e61abee522d1e",
+      "used_for": [
+        "transcripts/codex-b03.md"
+      ]
+    },
+    {
+      "id": "codex-b03-turn-2",
+      "origin": "codex/focused-disclosure-52315469/run-20261104-2acb9d23/transcripts/B03/turn-02.md",
+      "sha256": "6942bf935407cd2ad31b5c316deee137f50d3c357826552dc2bd1ff60243a738",
+      "used_for": [
+        "transcripts/codex-b03.md"
+      ]
+    },
+    {
+      "id": "codex-b03-turn-3",
+      "origin": "codex/focused-disclosure-52315469/run-20261104-2acb9d23/transcripts/B03/turn-03.md",
+      "sha256": "f6cd85e5a3f32879cd6f2c5f3720c039d60582995e6c4e9d96861d70553b9748",
+      "used_for": [
+        "transcripts/codex-b03.md"
+      ]
+    },
+    {
+      "id": "codex-b12-turn-1",
+      "origin": "codex/focused-disclosure-52315469/run-20261104-2acb9d23/transcripts/B12/turn-01.md",
+      "sha256": "9f122f260710d5eaa26c79fd75742a1f840e32c6e54e23ed2e47c63d01bbcaa0",
+      "used_for": [
+        "transcripts/codex-b12.md"
+      ]
+    },
+    {
+      "id": "claude-b03",
+      "origin": "claude/focused-disclosure-52315469/run-20261104T023748-a9d48e/transcripts/B03.md",
+      "sha256": "84732019f3c7fc2194fd2f8775efce577c8dd7655a30aba259adebc0cb963052",
+      "used_for": [
+        "transcripts/claude-b03.md"
+      ]
+    },
+    {
+      "id": "claude-b12",
+      "origin": "claude/focused-disclosure-52315469/run-20261104T023748-a9d48e/transcripts/B12.md",
+      "sha256": "93fc40738a76963e0d630b61f7d20d339bfeecede33285c4c76cb502baafe60a",
+      "used_for": [
+        "transcripts/claude-b12.md"
+      ]
+    },
+    {
+      "id": "codex-matrix-report",
+      "origin": "codex/matrix-20261104-012513/summary.md",
+      "sha256": "d426c2d4969a1c9c696e8b0af59cec3ab2a3a11d3e943704379000e2593c596e",
+      "used_for": [
+        "README.md",
+        "matrix.md"
+      ]
+    },
+    {
+      "id": "codex-focused-report",
+      "origin": "codex/focused-disclosure-52315469/run-20261104-2acb9d23/release-assessment.md",
+      "sha256": "bec1efb90d61d6fe07bb71c6863190032f26644070de21a0f55874d92cfb87f5",
+      "used_for": [
+        "README.md",
+        "matrix.md"
+      ]
+    },
+    {
+      "id": "claude-focused-report",
+      "origin": "claude/focused-disclosure-52315469/run-20261104T023748-a9d48e/release-assessment.md",
+      "sha256": "b06abea2ebe37261015aa7adba88e2c761e578d80d7eaf8f65d580af0ce7d02c",
+      "used_for": [
+        "README.md",
+        "matrix.md"
+      ]
+    },
+    {
+      "id": "codex-human-observation",
+      "origin": "codex/revised-walkthrough.md",
+      "sha256": "45e699923d3f80f5f21af468a7009a835f86a80b942cbea7786da0251e8cdb4e",
+      "used_for": [
+        "README.md",
+        "matrix.md"
+      ]
+    }
+  ],
+  "publication_note": "Selected sanitized user-visible excerpts and normalized outcomes. Full raw logs, credentials, configuration dumps, hidden reasoning, private paths and tool payloads are not included. Origin names are logical local artifact identifiers, not public URLs.",
+  "line_endings_note": "Observed hashes fingerprint working files. agents/openai.yaml had CRLF during trials and Git stores LF; use the LF-normalized digest for its Git blob. Instruction, reference and license hashes are unchanged by normalization."
+}

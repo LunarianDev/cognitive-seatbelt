@@ -1,0 +1,45 @@
+name: Behavior report
+description: Report a checkpoint, settings, installation, or host compatibility problem.
+title: "[Behavior]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Include only sanitized examples. Do not share credentials, private code, personal data, or client information.
+        A small reproduction helps distinguish the skill's intended behavior from host or model behavior.
+  - type: input
+    id: environment
+    attributes:
+      label: Host and model
+      description: Include host version, exact model, and reasoning configuration if known.
+      placeholder: Host, version, model, reasoning configuration
+    validations:
+      required: true
+  - type: input
+    id: installation
+    attributes:
+      label: Skill version and installation
+      description: Repository commit or source URL, installation method, and skill location. Write unknown where needed.
+    validations:
+      required: true
+  - type: input
+    id: invocation
+    attributes:
+      label: Invocation and active settings
+      description: Include the mode and communication flag, or say Seatbelt was not invoked.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction and observed behavior
+      description: Give the task, relevant active instructions, checkpoint trigger, follow-up answers, and what happened. Include a sanitized excerpt if possible.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Explain what you expected and reference a behavioral case ID if applicable.
+    validations:
+      required: true
