@@ -2,7 +2,7 @@
 
 Target title: **Cognitive Seatbelt v0.1.0: Stay in the Loop**.
 
-This is release preparation, not a published release or a record of completed behavioral trials. Logo work is tracked separately.
+This is release preparation, not a published release. [Recorded behavioral trials](trials/2026-11-04/README.md) include known limitations accepted for the early v0.1.0 candidate. Logo work is tracked separately.
 
 ## Repository presentation
 
@@ -31,11 +31,12 @@ Suggested topics: `agent-skills`, `ai-agents`, `ai-assisted-development`, `claud
 
 ## Evidence before promotion
 
-- [ ] Follow the documented installation path in a fresh Codex session.
-- [ ] Follow the documented installation path in a fresh local Claude Code session.
-- [ ] Publish a sanitized representative trial from each host, using the [trial record template](behavioral-testing.md#trial-record-template).
-- [ ] Record the exact model, host version, skill commit, and observed outcomes.
-- [ ] Check that public claims distinguish packaging support, observed behavior, and untested cases.
+- [x] Verify complete personal skill installation and native discovery in fresh Codex CLI sessions.
+- [x] Verify complete personal skill installation and native discovery in fresh local Claude Code sessions.
+- [x] Include sanitized representative trials from each host on this branch, with real human answers labeled separately from scripted inputs.
+- [x] Record exact models, host versions, tested skill hashes, base commit, and observed outcomes.
+- [x] Distinguish packaging support, observed behavior, untested cases, and the accepted B13/B12 limitations in public documentation.
+- [ ] Recheck the quick-start installer path against the reviewed public release ref after merge.
 
 The README example is illustrative and cannot satisfy these trial items. Logo work does not block behavioral testing.
 

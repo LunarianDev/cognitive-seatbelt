@@ -22,10 +22,10 @@ The key concept is concurrent rotation. The distractors represent plausible misu
 
 **Validation design:** Explain the concurrency fix and ask: "What test would distinguish this fix from code that only works for a single refresh request?" Accept a simultaneous-request test that checks the documented outcome. The agent can write and run it afterward.
 
-**Handoff:** After reporting the result and checks, ask: "In one sentence, what changed and what consequence should the next maintainer remember?" Assess against the actual result, including a known limitation where relevant.
+**Handoff:** After reporting the result and checks, compare the actual outcome with the user's earlier demonstrated understanding. If their answer already covers the change and its relevant consequence, identify that coverage and close the boundary without another question. Otherwise ask about the missing idea, for example: "In one sentence, what changed and what consequence should the next maintainer remember?" Assess against the actual result, including a newly discovered limitation where relevant. A skipped initial check supplies no answer to reuse; a later substantial handoff still needs resolution. Reporting results before asking is intentional: this checks interpretation, not unaided recall.
 
 ## Fair evaluation
 
 Decide the essential idea before asking. Evaluate meaning rather than phrasing, length, grammar, or fluency. Accept equivalent language and short answers. If the question was ambiguous or the agent's explanation was wrong, repair the premise rather than counting it as a user failure. Recognize partial understanding and correct only the missing point.
 
-Track only the pending boundary, question, essential idea, and attempts in chat context. Do not build scores, psychological profiles, or persistent learner records. A correct selection establishes the chosen recognition check, not proof of general competence. Do not invent measured cognitive benefits or token savings.
+Track the pending boundary, question, essential idea, and attempts, plus brief task-specific evidence of demonstrated understanding needed for later reuse, in chat context. Mark skipped checks separately; they supply no evidence of understanding. Preserve this state in a task handoff when needed, not as global preferences. Do not build scores, psychological profiles, or persistent learner records. A correct selection establishes the chosen recognition check, not proof of general competence. Do not invent measured cognitive benefits or token savings.

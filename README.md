@@ -135,7 +135,9 @@ In Claude Code, replace `$seatbelt` with `/seatbelt`. Changing only a communicat
 
 Seatbelt is an instructions-only conversational protocol. It has no runtime hook that blocks tools. Passing a checkpoint does not authorize deployment, deletion, or another external action, and it does not establish that generated code is correct.
 
-Behavior depends on the host, model, and retained chat context. In a noninteractive run, a required checkpoint should be returned as pending while dependent work stops. Cross-host behavioral testing remains to be completed; the example above is not evidence of reliability, learning benefits, or token savings.
+Behavior depends on the host, model, and retained chat context. In a noninteractive run, a required checkpoint should be returned as pending while dependent work stops. Recorded trials cover Codex CLI 0.166.0 with `gpt-6.1-sol / xhigh` and Claude Code 2.1.318 with `claude-opus-5-5 / medium`. The [trial report and sanitized transcripts](docs/trials/2026-11-04/README.md) distinguish the broader-rule candidate from the final disclosure change.
+
+Known limits remain. Claude disclosed a missing reference late in one of three focused attempts. Both hosts returned complete pending settings in the output stream but omitted the communication setting from the final message alone. Keep the full output when resuming one-shot work. These observations establish neither general reliability nor learning benefits or token savings; the example above is illustrative.
 
 The [behavioral testing checklist](docs/behavioral-testing.md) separates expected behavior from observed results and explains how to contribute a sanitized trial.
 
@@ -146,6 +148,7 @@ The [behavioral testing checklist](docs/behavioral-testing.md) separates expecte
 - [Skill instructions](skills/seatbelt/SKILL.md): the full protocol.
 - [Checkpoint reference](skills/seatbelt/references/checkpoints.md): question design and evaluation.
 - [Behavioral testing](docs/behavioral-testing.md): scenarios and trial records.
+- [Recorded trials](docs/trials/2026-11-04/README.md): tested configurations, evidence, and known limitations.
 - [Release checklist](docs/release-checklist.md): preparation for the first release.
 
 ## Contributing
