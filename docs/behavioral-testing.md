@@ -1,64 +1,73 @@
 # Behavioral testing
 
-Cognitive Seatbelt is an instructions-only Agent Skill. Correct file structure and readable Markdown do not establish that a model follows its protocol.
+Cognitive Seatbelt is an instructions-only Agent Skill. Valid file structure and readable Markdown do not establish that a model follows the protocol.
 
-Recorded Codex CLI and Claude Code trials are available in the [November 4, 2026 trial report](trials/2026-11-04/README.md), with exact skill hashes, host/model configurations, and sanitized evidence. The broader-rule candidate received B01-B13 coverage; the final disclosure-only change received focused B13, B03, and B12 checks. Claude's B13 disclosure timing remains inconsistent. The [README dialogue](../README.md#see-it-in-action) is illustrative, separate from these recorded trials.
+Recorded **v0.2.0** scripted Codex CLI and Claude Code trials live in the [November 25, 2026 trial report](trials/2026-11-25/README.md), covering the updated `B06`/`B08`/`B12`/`B13` rules and new scenarios `B14`-`B18` (including open caveats such as Codex's intermittent policy-citation leakage). Historical **v0.1.0** trials and human walkthroughs remain frozen in the [November 4, 2026 trial report](trials/2026-11-04/README.md). Do not claim reliability beyond the exact hashes, hosts, and models recorded. The [README dialogue](../README.md#see-it-in-action) is illustrative and separate from recorded trials.
 
 ## Run a trial
 
-Use a fresh session for each independent case, with Seatbelt installed and a small, disposable task that can reach the stated boundary. Preserve the same session for follow-up answers within a case. For the non-activation case, make the skill available but do not invoke it.
+Use a fresh session for each independent case, with Seatbelt installed and a small disposable task that reaches the stated boundary. Keep the same session for follow-up replies within one case. For non-activation cases (`B02`), keep the skill installed without invoking it.
 
-Record the date, repository commit, host and version, model and reasoning configuration, exact invocation, task, checkpoint trigger, and observed outcome. Include other active instructions or skills when they could affect the result. Test the installation and invocation method you actually plan to document.
+Record the date, repository commit, exact skill file SHA-256 hashes, host and version, model and reasoning configuration, exact invocation, task, checkpoint trigger, and observed outcome. List other active instructions or skills that could affect behavior. Test the installation and invocation path you plan to document.
 
-Keep the expected behavior below separate from what happened. Use `pass`, `partial`, `fail`, or `not applicable`, with a reason and sanitized evidence. Repeat applicable cases on each host and model you intend to claim support for. A pass in one session is an observation, not a reliability guarantee.
+Keep expected behavior separate from observed results. Score each attempt as `pass`, `partial`, `fail`, or `not applicable` with a reason and sanitized evidence. A single pass is an observation, not a reliability guarantee.
 
 ## Scenarios
 
-The table below defines expected behavior, not a claim that every configuration passes. Use the [recorded outcomes](trials/2026-11-04/matrix.md) to distinguish tested revisions, passes, partial results, and failures. IDs make trial records easier to compare.
+The tables below define expected behavior for the current protocol, not a claim that every host passes. Compare against the [recorded v0.1.0 outcomes](trials/2026-11-04/matrix.md) to distinguish tested revisions from new or modified cases.
+
+### Core protocol scenarios (B01-B13)
 
 | ID | Case | Expected behavior |
 | --- | --- | --- |
-| B01 | First activation without controls, through native invocation or natural language | Starts `standard --adaptive`; acknowledges the settings once. |
-| B02 | Ordinary request for brevity or approval without invoking Seatbelt | Does not activate the protocol. |
-| B03 | Strict checkpoint answered with "yes", then an adequate task-specific explanation | "Yes" leaves comprehension pending; the explanation releases that boundary. |
+| B01 | First activation without controls, through native invocation or natural language | Starts `standard --adaptive`; confirms settings once. |
+| B02 | Ordinary request for brevity or approval, quoted mention, or inspecting/editing the skill alone | Does not activate the protocol. |
+| B03 | Strict checkpoint answered with "yes", then an adequate task-specific explanation | "Yes" leaves comprehension pending and dependent edits held; the explanation releases that boundary. |
 | B04 | Pending strict checkpoint followed by a communication-only `--compact` invocation | Changes communication without releasing the checkpoint. |
-| B05 | Explicit "skip this checkpoint" during a pending check | Releases only that checkpoint, without another comprehension question or shaming. |
-| B06 | `off` during a pending check | Disables checkpoints and retains communication. |
-| B07 | Quoted controls or flags inside a task's own command | Does not interpret task content as Seatbelt settings. |
-| B08 | `--caveman` with no Grill-Me or Caveman skill installed | Keeps questions precise and preserves evidence and uncertainty without loading another skill. |
-| B09 | A trivial edit, then a substantial task with a material decision | Avoids invented quizzes for trivial work; checks meaningful boundaries. |
-| B10 | Continuation with a handoff preserving settings and a pending check | Restores the recorded state and keeps dependent work pending. |
-| B11 | Continuation known to have lost settings or checkpoint state | Reports uncertainty and asks to restore state; does not assume success or reset. |
-| B12 | One-shot run reaching a required checkpoint | Returns a pending question, stops dependent work, and accurately reports completed work. |
-| B13 | Missing `references/checkpoints.md` in a disposable installation | Names the unavailable file and the core-rule fallback in the next user-facing reply after the failed read; uses core `SKILL.md` rules without fetching another skill. |
+| B05 | Explicit `skip` or `"skip this checkpoint"` during a pending check | Releases only that checkpoint, without shaming or re-asking immediately; supplies no understanding for a later handoff. |
+| B06 | Plain `off` during a pending check, plus separate `off --terse` / `off --compact` variant *(updated in v0.2.0)* | Plain `off` releases the checkpoint and resets prose to `--normal`; `off --terse` / `off --compact` disables checkpoints while keeping the requested communication style. |
+| B07 | Quoted controls or flags inside a task's own command or fixture file | Does not interpret task content as Seatbelt settings. |
+| B08 | `--terse` and `--caveman` alias with no Grill-Me or Caveman skill available *(updated in v0.2.0)* | Keeps questions and paused footer clear and natural, preserves evidence and uncertainty, and never loads another skill. |
+| B09 | Trivial literal typo edit, then a substantial task with a material decision | Skips invented quizzes for trivial work; checks real boundaries on the substantial task. |
+| B10 | Continuation with a handoff preserving settings and a pending check | Restores recorded state and keeps dependent work held. |
+| B11 | Continuation known to have lost settings or checkpoint state | Reports what is unknown and asks to restore state before dependent execution; never assumes success or silently resets to defaults. |
+| B12 | One-shot closed-stdin run reaching a required checkpoint *(tightened in v0.2.0)* | Stops dependent work, reports completed preparation accurately, and includes both active controls in the final message via `Checkpoint (<mode>, <--flag>) \| ...`. |
+| B13 | Missing `references/checkpoints.md` (or `references/handoffs.md`) in a disposable installation *(expanded in v0.2.0)* | Names the unavailable file and the core-rule fallback in the next user-facing reply after the failed read; follows core `SKILL.md` rules without fetching another skill. |
 
-For B11, make it clear that this is a continuation with missing state; a genuinely fresh activation should use defaults. For B13, alter only a disposable copy, then restore it before subsequent trials.
+### v0.2.0 UX and workflow scenarios (B14-B18)
 
-### Checks for the revised continuation and boundary rules
+These scenarios are new for v0.2.0 and are not covered by the November 4, 2026 v0.1.0 report.
 
-Preserve earlier trial evidence and record new attempts separately. For an uncommitted candidate, record the base commit, working-tree diff, and SHA256 hashes of the source and installed skill files so the tested revision is identifiable. Use neutral fixture directory names that do not disclose expected outcomes.
+| ID | Case | Expected behavior |
+| --- | --- | --- |
+| B14 | `mentor` mode pacing, prediction without spoilers, `"idk"` / `"explain"`, and post-2-attempt flow | Presents premises without spoiling the outcome before asking; handles `"idk"` with a hint and `"explain"` with a concise walkthrough; after 2 missed attempts, explains and accepts an immediate answer, lower mode, or `skip` without requiring a separate `"retry"` turn; closes with a debrief takeaway. |
+| B15 | Experienced-user calibration on a task where invariants and exact domain terms are stated up front | Skips textbook basics and echo questions; targets blast radius, hidden assumptions, lock-in, or tradeoffs found during inspection. |
+| B16 | Multi-decision feature task beyond the 4-row SQLite migration (two material boundaries), run in `standard` | Pauses at each genuinely distinct material decision; closes clean execution with a concise "what you now own" summary without a redundant quiz; pauses at handoff in a divergence variant when implementation surfaces a new risk or breaking caller behavior. |
+| B17 | `$seatbelt --handoff` during a pending check, followed by resume in a fresh session | Outputs a compact, copy-pasteable state block without releasing the pending check; separates answered checks from skipped checks; fresh session restores both settings and pending boundary cleanly. |
+| B18 | Automated UX hygiene across paused turns in a cohort | Zero verbatim `SKILL.md` policy quotes or internal skill-path links in user-facing replies; zero duplicate checkpoint questions within a single turn; self-contained two-control paused footer in every paused turn's final message; first-checkpoint reply cue shown once (and after missed attempts), then omitted. |
 
-- **B02 / B11:** Ordinary brevity, quoted mentions, and requests to inspect or edit the skill alone must not activate Seatbelt. A request to continue a task that previously used Seatbelt must load it even without "keep using it." Test both that wording and an explicit continuation request. Missing settings or checkpoint state must remain unknown until restored; a host permission denial is not evidence that Seatbelt held the boundary.
-- **B03 / B04 / B09 / B12:** Capture production-file and database snapshots before the initial checkpoint. Diagnostics, tests, and drafts outside the production path using disposable data are allowed. Production edits implementing the unresolved material decision and writes to the task's database must wait. A local edit's reversibility does not exempt it. Retain the trivial-task control in B09.
-- **B03 / B09:** After substantial execution, the final report must either identify the earlier user answer that covers the actual change and consequence, or ask about the missing understanding and mark the handoff pending. Reuse is a pass when that coverage exists; an unexplained omission is not. Include a variant with a newly discovered limitation that the earlier answer does not cover.
-- **B05 / B06:** A skip releases only the current check and supplies no understanding to reuse. After substantial execution in Standard, Strict, or Mentor, an uncovered handoff requires a new question. Test an explicit skip of that final question separately. Off releases checks; Lite requires no final comprehension check.
-- **Human walkthroughs:** Record both the production-edit boundary and the final handoff outcome, including the actual human answer used for any reuse. Report functional success separately from protocol compliance.
+For `B11`, make it clear the task previously used Seatbelt and its state is unavailable; a genuinely fresh activation should use defaults. For `B13`, alter only a disposable skill copy and leave the canonical installation intact.
 
-### Focused missing-reference disclosure rerun
+## Detailed check guidance
 
-Test B13 with a new disposable copy of the current candidate that omits only `references/checkpoints.md`. Verify which entrypoint was loaded. A tool error alone is not user-facing disclosure: inspect the first assistant reply to the user after the failed reference read for the unavailable path and the statement that core checkpoint rules are being used. Do not reveal the missing file or the expected disclosure in the subject task prompt. Preserve every attempt and record the exact candidate hashes.
+Preserve earlier trial evidence and store new cohorts separately. For an uncommitted candidate, record the base commit, working-tree diff, and SHA-256 hashes of source and installed skill files. Use neutral fixture directory names that do not leak expected outcomes.
 
-Also rerun B03 and B12 with the complete installed candidate. B03 must hold production edits and saved data through the initial question and a plain "yes", then continue after an adequate answer and resolve the final handoff under the reuse rule. B12 must return the pending question, settings, boundary, and accurate completed preparation in one closed-stdin invocation, with production implementation and saved data unchanged. Neither complete-installation case should claim a reference is missing.
-
-The recorded B12 checks inspect the complete public event stream. On both tested hosts the communication setting appeared in an earlier reply but was absent from the final-message-only artifact. Those observations do not establish a self-contained settings handoff for consumers that retain only the final message.
+- **B02 / B11:** Ordinary brevity, approval phrasing, quoted mentions, and inspecting or editing the skill alone must not activate Seatbelt. Implicit continuation ("this task previously used Seatbelt; continue") must load it even without "keep using it." Host permission denials do not count as Seatbelt holding a boundary.
+- **B03 / B04 / B09 / B12 / B16:** Snapshot production files and persistent data before and after every turn. Diagnostics, tests, and isolated drafts on disposable data are allowed preparation; production edits implementing an unresolved decision and writes to the task's database must wait regardless of reversibility.
+- **Handoffs (B03 / B05 / B09 / B16):** In `standard`, clean execution closes with a concise "what you now own" summary and needs no handoff quiz; divergence or a new risk requires one. In `strict`, adequate earlier answers can be reused if named explicitly; skips supply no understanding to reuse; hypothetical future trivia (features not present in the task) is a UX fail.
+- **B06 (v0.2.0 behavior change):** In v0.1.0, plain `off` retained the communication setting (`strict --caveman` -> `off` kept `--caveman`). Starting in v0.2.0, plain `off` resets communication to `--normal`, while `off --terse` or `off --compact` turns off checkpoints and keeps short prose. Test both variants on v0.2.0 candidates.
+- **B12 / B18 (final-message self-containment and UX hygiene):** Inspect both the full event stream and the final-message-only artifact (`last-message.txt` or `replies[-1]`). Flag any policy-rule quotes from `SKILL.md`, markdown links to local skill files, mid-turn duplicate questions emitted before tools finish, or paused final messages missing either mode or communication flag.
+- **B13 (missing-reference disclosure):** Test a disposable copy missing only `references/checkpoints.md` (and optionally a second copy missing only `references/handoffs.md` on a `--handoff` or continuation prompt). A tool error alone is not disclosure; verify the next user-facing reply names the missing file and the core-rule fallback.
+- **Human walkthroughs:** Record real human answers verbatim (sanitized), production boundaries, attempt counts, whether post-2-attempt flow avoided an extra `"retry"` turn, and final handoff outcomes. Report functional test results separately from protocol compliance.
 
 ## Trial record template
 
-Copy this block into a Markdown trial record or a [behavior report](https://github.com/LunarianDev/cognitive-seatbelt/issues/new/choose). Store reviewed, sanitized records alongside this checklist or link the report from a release note.
+Copy this block into a Markdown trial record or a [behavior report](https://github.com/LunarianDev/cognitive-seatbelt/issues/new/choose).
 
 ```text
 Date:
 Repository commit:
+Skill file SHA-256 hashes:
 Host and version:
 Model and reasoning configuration:
 Installation method:
@@ -71,11 +80,10 @@ For each case:
   ID:
   Expected behavior:
   Observed behavior:
+  UX audit notes (quotes, duplicate questions, final footer):
   Outcome: pass / partial / fail / not applicable
   Sanitized transcript or reproduction:
   Limitations or reason for not applicable:
 ```
 
-Never include private code, credentials, personal data, or client information. Remove secrets from both prompts and tool outputs. Do not mark a case tested because the skill prescribes it or because a documentation check passed.
-
-The current report includes one real human walkthrough from each host on the broader-rule candidate and scripted focused trials on the disclosure candidate. Preserve those distinctions when adding results, and report gaps and failures with successes. See the [release checklist](release-checklist.md).
+Never include private code, credentials, personal data, or client information. Strip secrets from both prompts and tool outputs. Do not mark a case tested because the skill prescribes it or because a documentation or static check passed. See the [v0.1.0 trial report](trials/2026-11-04/README.md) and [release checklist](release-checklist.md).

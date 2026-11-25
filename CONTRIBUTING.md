@@ -26,7 +26,7 @@ Before submitting:
 1. Check that local Markdown links resolve and examples match the skill instructions.
 2. Run `git diff --check` to catch whitespace errors.
 3. For behavior changes, run applicable [trial cases](docs/behavioral-testing.md) in fresh sessions and report the host, model, and evidence. State what you could not test.
-4. Confirm the complete skill folder still includes its reference and license.
+4. Confirm the complete skill folder still includes its references (`references/checkpoints.md`, `references/handoffs.md`) and `LICENSE`.
 
 Documentation-only edits need documentation checks; they do not establish model compliance. Keep illustrative dialogue labeled as such.
 
