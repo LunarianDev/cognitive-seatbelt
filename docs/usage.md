@@ -1,63 +1,108 @@
 # Controls and checkpoint behavior
 
-For a first task and the mode tables, start with the [README](../README.md). The [skill instructions](../skills/seatbelt/SKILL.md) define the full behavior.
+Start with the [README](../README.md) for the quick start and mode selector. The [skill instructions](../skills/seatbelt/SKILL.md) define the complete protocol.
 
 ## Invocation and settings
 
-Use the host's invocation mechanism:
+Use your host's invocation syntax:
 
 ```text
-$seatbelt [off|lite|standard|strict|mentor] [--normal|--compact|--caveman|--adaptive] <task>
+$seatbelt [off|lite|standard|strict|mentor] [--normal|--compact|--terse|--adaptive] <task>
 ```
 
-In Claude Code, use `/seatbelt` instead of `$seatbelt`. After installation, you can also ask in natural language:
+In Claude Code, use `/seatbelt` instead of `$seatbelt`. `--caveman` is a full alias for `--terse`. You can also invoke Seatbelt in plain language:
 
 ```text
-Use Cognitive Seatbelt in strict mode with compact communication while fixing this bug.
+Use Cognitive Seatbelt in strict mode with compact output while fixing this bug.
 ```
 
-The first activation defaults to `standard --adaptive`. Later invocations change only the controls you supply. A bare invocation retains the current settings. `--help` and `--status` are informational; they do not activate or reset the protocol.
+How settings persist:
+- First activation defaults to `standard --adaptive`, applying any controls you specify.
+- Later invocations change only the controls you supply; a bare invocation keeps current settings.
+- Plain `$seatbelt off` disables checkpoints **and** resets communication to `--normal`. To disable checkpoints while keeping short prose, pass the flag explicitly: `$seatbelt off --terse` or `$seatbelt off --compact`.
+- `--help`, `--status`, and `--handoff` are informational. They do not activate, reset, or release a checkpoint.
+- Controls are read adjacent to the invocation, never inside quoted text, code, or task commands. When the same axis appears twice, the last value wins. An unknown control prompts clarification instead of an invented mode.
 
-The agent should read controls adjacent to the invocation, not flags inside quoted material, code, or your task's commands. On one axis, the last repeated setting wins. An unknown control should prompt clarification rather than an invented mode.
+## Inside a checkpoint
 
-## A checkpoint
+The agent finishes its planned preparation first (inspection, diagnostics, tests, or isolated drafts on disposable data), then asks **one** focused question at the end of the turn. It holds dependent production edits and writes to the task's database until the checkpoint resolves or is skipped, even when those edits are local and reversible.
 
-The agent investigates available evidence, explains the proposed change and its consequence, then asks one focused question. It pauses the action that depends on your answer; independent preparation can continue.
+Every paused turn ends with a clean footer carrying both active controls and the waiting boundary:
 
-Preparation can include diagnostics, tests, and drafts kept outside the production path using disposable data. Production edits implementing an unresolved material decision and writes to the task's database must wait, even when those edits are local and reversible.
+```text
+Checkpoint (strict, --compact) | Paused before: app/migration.py, data/users.sqlite3
+```
 
-In `standard`, a choice or short explanation can resolve a decision. In `strict` and `mentor`, the question asks for task-specific understanding. A correct multiple-choice answer suffices when recognition is the chosen check. Teach-back accepts the essential idea in your own words; exact terminology is unnecessary.
+On the first checkpoint in a session (and after any missed attempt), the agent adds one short cue line:
 
-An incomplete answer gets a targeted follow-up. A misconception gets a short explanation and a reframed question. After two unsuccessful attempts, the agent should offer a short explanation and choices to retry, lower the mode, or skip. It should not shame you or produce a learner score.
+```text
+One sentence is enough. Reply "idk" for a hint, "explain", or "skip" to move on.
+```
 
-## Skipping and stopping
+That cue is omitted on later checkpoints once you have seen it.
 
-Say `skip this checkpoint` to release only the current checkpoint. Use `$seatbelt off` to disable checkpoints while retaining the communication setting, or `$seatbelt off --normal` to return both controls to ordinary behavior. Use `/seatbelt` for those commands in Claude Code.
+Checkpoint depth adapts to the task and to what you already know:
+- If you state constraints, failure modes, or exact domain terms up front, Seatbelt skips textbook basics and checks blast radius, hidden assumptions, lock-in, or tradeoffs found during inspection.
+- If you are learning the stack, Seatbelt translates jargon once in plain language and anchors questions in concrete examples from the task.
+- Seatbelt avoids echo questions (never asking something whose answer was printed verbatim right above it) and avoids quoting its own `SKILL.md` rules at you.
 
-A communication-only change, such as `--compact`, does not release a pending checkpoint. A mode change reevaluates it under the new mode. An ordinary "go ahead" does not answer a pending strict comprehension question; an explicit instruction to bypass the check does.
+## Replying, getting hints, and skipping
 
-A skip supplies no understanding for a later boundary. At a substantial handoff in Standard, Strict, or Mentor, the agent reports the result and validation, then either identifies an earlier answer that covers the actual change and consequence or asks about the missing understanding. A new limitation can require another check. An explicit skip of that final check or Off releases it; Lite requires no final comprehension check.
+In `standard`, a choice or brief explanation resolves the boundary. In `strict` and `mentor`, the agent checks for the essential mechanism or consequence in your own words; exact terminology is unnecessary.
+
+Natural short replies work at any checkpoint:
+- **`idk` / `I don't know` / `hint`**: Gives a short hint or concrete anchor without penalty and asks a narrower version.
+- **`explain`**: Explains the mechanism or tradeoff clearly, then lets you restate it in your own words right away, lower the mode, or skip.
+- **`skip` / `skip this checkpoint`**: Releases only the current checkpoint without shaming or extra confirmation.
+- **`lower to standard` / `switch to lite`**: Reevaluates the pending boundary under the new mode.
+- **`$seatbelt off`**: Releases the checkpoint and returns both controls to ordinary behavior (or `$seatbelt off --terse` to keep terse prose).
+
+After two unsuccessful attempts at the same checkpoint, the agent explains the missed point clearly and lets you answer immediately in your next reply, lower the mode, or skip. You do not need to send a separate `"retry"` turn first.
+
+A communication-only change (such as `$seatbelt --compact`) does not release a pending checkpoint. A plain `"yes"` or `"go ahead"` can authorize task work where appropriate, but does not pass a pending `strict` or `mentor` comprehension question.
+
+## Handoffs by mode
+
+After substantial execution, the agent reports actual changes and verification results first, then closes the handoff according to mode:
+- **`lite`**: No final comprehension check.
+- **`standard`**: Closes clean execution with a short "what you now own" summary. Pauses for a handoff question only if execution materially diverged or uncovered a new risk or limitation.
+- **`strict`**: Reuses earlier demonstrated understanding if it covers the actual change and its real consequences (briefly naming what it covered). Asks a final check when the initial check was skipped, execution diverged, a real caveat surfaced, or callers face an uncovered breaking change. It should never invent hypothetical future trivia just to ask a question.
+- **`mentor`**: Closes with a short debrief takeaway, or one reflection question if a key consequence remained uncovered.
+
+A skipped initial check supplies no demonstrated understanding for a later handoff.
 
 ## Keep interruptions proportional
 
-Checkpoints belong at material decisions, deviations, and substantial handoffs. Routine formatting and already-agreed repetitive work normally need none, even in strict mode. The agent should reuse demonstrated understanding until the decision or its consequences change.
+Checkpoints belong at material decisions, deviations, and real risks. Mechanical formatting, literal text replacements, lookups, and agreed repetitive work normally need none, even in `strict`.
 
-Compression affects conversational wording, not reasoning depth, technical precision, or deliverable content unless you request that too. Questions must remain natural and precise, including with `--caveman`.
+Compression affects conversational explanations, not reasoning depth, uncertainty, or deliverable content unless requested. Checkpoint questions and the paused footer stay in clear, natural language, including under `--terse` or `--caveman`.
 
-## Handoffs and missing context
+## `--handoff`, continuation, and missing state
 
-Settings live in the current chat rather than global preferences. A handoff should preserve the mode, communication setting, any pending checkpoint's task, boundary, question, essential idea, and attempt count, plus the understanding already demonstrated. Answered and skipped checks are separate.
+Settings stay in chat context; Seatbelt never writes global preferences. Run `$seatbelt --handoff` (or `/seatbelt --handoff`) before moving to a new chat or worktree to get a compact, copy-pasteable state block containing your active mode, communication flag, task, pending checkpoint, attempt count, answered checks, skipped checks, and completed vs. held work. See [references/handoffs.md](../skills/seatbelt/references/handoffs.md) for the exact format.
 
-When you ask to continue a task that previously used Seatbelt, the agent should load the skill even without a fresh invocation. If that state is lost, it should consult available history, report what remains unknown, and ask you to restore the settings and resolve uncertain boundaries before dependent execution. It should not assume a checkpoint passed or silently reset the protocol. Canceling a task retires its checkpoint while retaining the two settings.
+When you ask to continue a task that previously used Seatbelt, the agent loads the skill even without a fresh invocation. If prior state was lost, it inspects available history, reports what remains unknown, and asks you to restore settings and resolve uncertain boundaries before dependent work. It should not assume a checkpoint passed or silently reset to defaults. Canceling a task retires its checkpoint while keeping your two settings.
 
-## Noninteractive work and permissions
+## Opt-in defaults via `AGENTS.md` or `CLAUDE.md`
 
-When a required checkpoint cannot be answered in a one-shot run, the agent should return the pending question and stop dependent work. It should accurately distinguish completed work from work still waiting.
+Seatbelt never writes global config files or modifies your setup on its own. If you want Seatbelt active by default in one repository (or across your personal projects), add a short opt-in snippet to your project's `AGENTS.md` or `CLAUDE.md` (or your personal `~/.codex/AGENTS.md` / `~/.claude/CLAUDE.md`):
 
-Retain the full public output stream when continuing one-shot work. In the [recorded trials](trials/2026-11-04/README.md#known-limitations), both hosts included complete settings earlier in the stream but omitted the communication setting from the final message alone.
+```markdown
+## Cognitive Seatbelt default
 
-Comprehension and permission are separate. Passing a checkpoint grants no authority for deployment, deletion, spending, or other external actions. Seatbelt remains subject to the task's authorization and the host's higher-priority rules.
+For non-trivial code, schema, or architecture changes in this repository, use the
+installed `seatbelt` skill in `standard --adaptive` mode (or `strict --compact` for
+database migrations and auth changes) unless I explicitly turn it off with `off`.
+```
 
-If a bundled reference cannot be read, the skill requires the next user-facing reply to identify the file and explain that core rules are being used. Claude followed that timing in two of three focused attempts and disclosed it late in the third. See the [recorded limitations](trials/2026-11-04/README.md#known-limitations).
+Adjust the mode and scope to match the repo. Remove the block whenever you want Seatbelt back to explicit invocation only.
 
-These are model instructions, not runtime enforcement. See [behavioral testing](behavioral-testing.md) for expected scenarios and the recorded host/model coverage.
+## Noninteractive runs and permissions
+
+When a required checkpoint cannot be answered in a one-shot run, the agent stops dependent execution, reports completed preparation accurately, and ends its final message with the pending question and the two-control `Checkpoint (<mode>, <--flag>) | ...` footer so final-message-only outputs stay self-contained.
+
+Comprehension and permission remain separate. Passing a checkpoint never authorizes deployment, deletion, external messages, spending, or other gated actions. Seatbelt stays subordinate to the task's authorization rules and the host's higher-priority constraints.
+
+If a bundled reference (`references/checkpoints.md` or `references/handoffs.md`) cannot be read, the skill instructs the agent to name the missing file in its next user-facing reply and follow the core rules in `SKILL.md`.
+
+These are model instructions, not runtime enforcement. See [behavioral testing](behavioral-testing.md) for expected scenarios and [recorded v0.1.0 trials](trials/2026-11-04/README.md) for observed host behavior.

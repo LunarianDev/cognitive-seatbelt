@@ -5,87 +5,121 @@ description: Use when the user invokes seatbelt (such as $seatbelt or /seatbelt)
 
 # Cognitive Seatbelt
 
-Let the agent absorb execution effort while the human retains understanding of goals, decisions, tradeoffs, and outcomes. Add this protocol to the user's actual task; do not replace that task with a general interview. This is an instructions-only skill: checkpoints are conversational behavior, not runtime tool barriers or a guarantee of learning.
+Let the agent do the execution while the human keeps ownership of goals, decisions, tradeoffs, and outcomes. Apply this protocol to the user's task instead of turning it into a general interview. Checkpoints are conversational pauses, not runtime tool barriers or a guarantee of learning.
 
-This skill is self-contained: neither Grill-Me (Grilling) nor Caveman needs to be installed or activated. No scripts, packages, network access, or specific question tool are required. Resolve bundled reference paths relative to this skill's directory. If a bundled reference cannot be read, tell the user in your next user-facing reply which file is unavailable and that you are using the core checkpoint rules in this entrypoint. Do not fetch another skill or invent reference contents.
+This skill is self-contained: neither Grill-Me (Grilling) nor Caveman needs to be installed or activated, and no scripts, packages, network access, or specific question tool are required.
 
-## Invocation and two independent controls
+Resolve bundled references relative to this skill's directory:
+- [references/checkpoints.md](references/checkpoints.md): question craft, experience calibration, and evaluation for `strict` and `mentor`.
+- [references/handoffs.md](references/handoffs.md): `--handoff` block format, lost-state recovery, and one-shot resume details.
+
+**Missing reference rule:** If a bundled reference cannot be read, tell the user in your next user-facing reply which file is unavailable and that you are using the core rules in this entrypoint. Never fetch another skill or invent reference contents.
+
+## Invocation and controls
 
 ```text
-$seatbelt [off|lite|standard|strict|mentor] [--normal|--compact|--caveman|--adaptive] <task>
+$seatbelt [off|lite|standard|strict|mentor] [--normal|--compact|--terse|--adaptive] <task>
 ```
 
-Use the host's invocation mechanism: `$seatbelt` in Codex, `/seatbelt` in Claude Code, or a natural-language request such as "Use Cognitive Seatbelt in strict mode with compact communication for this task." All forms use the same controls. When the host supplies invocation arguments separately, interpret those arguments as the controls and task. These are model instructions, not executable commands; no host-specific argument placeholder is required.
+Use the host's syntax (`$seatbelt` in Codex, `/seatbelt` in Claude Code) or plain language ("Use Cognitive Seatbelt in strict mode with compact output"). Treat `--caveman` as a full alias for `--terse`. If the host passes arguments separately, read them as controls and task. These are model instructions, not shell commands.
 
 Examples:
 
 ```text
-$seatbelt strict --caveman Fix the session refresh race.
-$seatbelt mentor --compact Help me learn this codebase while fixing the bug.
-$seatbelt lite --normal Update the onboarding text.
-$seatbelt --compact
+$seatbelt strict --terse Fix the session refresh race.
+$seatbelt mentor --normal Help me learn this codebase while fixing the bug.
+$seatbelt lite --compact Update the onboarding copy.
+$seatbelt --handoff
 $seatbelt off
+$seatbelt off --terse
 ```
 
-First activation defaults to `standard --adaptive`. Later invocations change only explicitly supplied settings; a bare invocation retains the active settings. Switching cognitive mode never changes communication style, and changing a communication flag never changes cognitive mode. `off` disables Seatbelt questions while retaining the communication setting; `off --normal` returns both controls to ordinary behavior.
+- **Defaults and persistence:** First activation defaults to `standard --adaptive`, applying any controls supplied. Later invocations change only supplied controls; a bare invocation keeps current settings.
+- **Exception for `off`:** Plain `off` (no flag supplied) disables checkpoints and resets communication to `--normal`. Pair `off` with a flag (`off --terse`, `off --compact`, `off --adaptive`) to turn off checkpoints while keeping short prose.
+- **Parsing:** Read controls adjacent to the invocation, never inside quoted text, code, or task commands. For repeated controls on one axis, the last value wins; state the resolved settings briefly. For an unknown control, name it and clarify before starting gated work.
+- **Confirmation:** Confirm effective settings in one short line on activation or change. Do not repeat that line on every turn.
+- **Informational commands** (never activate, reset, or release a checkpoint, and do not start task work):
+  - `--help`: Show syntax, modes, flags (`--terse` with `--caveman` alias), defaults, reply shortcuts (`idk`, `hint`, `explain`, `skip`, `lower to <mode>`), and `--status` / `--handoff`.
+  - `--status`: Report active settings and any pending checkpoint, `inactive` if never activated in this chat, or `unknown` if prior state may have been lost.
+  - `--handoff` (or a natural-language handoff request): Read [references/handoffs.md](references/handoffs.md) if available and output a compact, copy-pasteable state block (mode, flag, task, pending boundary/question/essential idea/attempts, answered checks kept separate from skipped checks, and completed vs. waiting work).
 
-Read controls adjacent to the invocation, not flags appearing inside quoted material, code, or the task's own commands. For repeated settings on one axis, the last supplied value wins; briefly state the resolved settings. If a control is unknown, identify it and clarify rather than invent a mode or start gated execution under an assumed setting.
+## Session state and continuation
 
-`--help` with the host's Seatbelt invocation shows syntax, modes, flags, and defaults. `--status` reports the current settings and any pending checkpoint, or reports inactive if it has never been activated in this chat. If prior state may have been lost, report it as unknown instead of inactive. These are informational commands: they do not activate, reset, or release a checkpoint, and need not start task work.
-
-Keep settings and pending checkpoints in this chat's context, including a handoff summary when available. Associate each checkpoint with its task and decision; retire it if the user cancels or replaces that task, while retaining the two settings. Do not write global preferences, alter another skill, or infer settings from unrelated chats. On activation or a change, acknowledge the effective mode and communication setting in one short line. Do not repeat the banner on every response.
-
-When the user says the task previously used Seatbelt and asks to continue it, load this skill and treat the request as a continuation even without a fresh invocation or "keep using it" instruction. A quoted mention, unrelated prior task, or request to inspect or edit this skill alone is not a continuation trigger. Honor an explicit instruction to turn Seatbelt off.
-
-Before a context handoff, preserve the effective mode and communication setting, any pending checkpoint's task, boundary, question, essential idea, and attempt count, and a brief record of the user's demonstrated understanding relevant to remaining boundaries. Distinguish answered checks from skipped checks. If a continuing task has lost its settings or checkpoint state, consult available history or its handoff summary. If still unavailable, state what is unknown and ask the user to restore the settings and resolve any uncertain boundary before dependent execution. Do not treat missing state as inactive, assume a checkpoint passed, or silently reset an active protocol to defaults. A genuinely fresh activation still uses the defaults.
+- Keep settings and checkpoints in chat context only. Never write global preferences, edit another skill, or infer settings from unrelated chats.
+- Tie each pending checkpoint to its task and decision; if the user cancels or replaces that task, retire its checkpoint and keep the two active settings.
+- When the user asks to continue a task that previously used Seatbelt, load this skill even without a fresh invocation or "keep using it." Quoted mentions, unrelated tasks, or inspecting/editing this skill alone do not activate it.
+- If prior settings or checkpoint state are lost, check available history or handoff notes first (see [references/handoffs.md](references/handoffs.md)). If still unavailable, state what is unknown and ask to restore settings and resolve uncertain boundaries before dependent work. Never treat missing state as inactive, assume a check passed, or silently reset to defaults.
 
 ## Cognitive modes
 
-| Mode | When and how to involve the human |
-|---|---|
-| `off` | No Seatbelt checkpoints. Continue ordinary task work. |
-| `lite` | For meaningful work, give a brief plan and ask one alignment question before the first dependent action. After the user answers, execute without recurring quizzes; revisit alignment only if the goal or scope materially changes. |
-| `standard` | Use Lite alignment, then check major decisions, material deviations, and the handoff of substantial work. Pause for the user's choice, interpretation, or a short explanation when prior understanding does not already cover the boundary. Resolve ambiguity collaboratively; do not grade every answer. |
-| `strict` | At those boundaries, require a task-specific demonstration of understanding before the dependent action. An approval such as "yes" is insufficient for a comprehension question. Use the checkpoint procedure below. |
-| `mentor` | Use Strict checkpoints and occasional prediction, teach-back, error spotting, or a proposed test. Let the user attempt the reasoning before revealing the explanation, with enough evidence to make a fair attempt. Then perform the execution. |
+| Mode | Human involvement |
+| --- | --- |
+| `off` | No Seatbelt checkpoints. Plain `off` resets prose to `--normal`. |
+| `lite` | Brief plan and one alignment question before the first dependent action; no final comprehension check. Revisit only if scope materially changes. |
+| `standard` | Lite alignment plus checks at major decisions and material deviations. Resolve collaboratively without grading every reply. |
+| `strict` | Require task-specific understanding before dependent work at material boundaries. A plain "yes" or "go ahead" does not pass a comprehension check. |
+| `mentor` | Strict checkpoints plus occasional prediction, teach-back, error spotting, or test design. Give enough evidence for a fair attempt, never spoil predictions before asking, keep teaching proportional, and let the user steer what to learn vs. delegate. |
 
-Use judgment to keep friction proportional to the work. Mechanical formatting, literal text replacements, repository lookup, and already-agreed repetitive execution normally need no checkpoint, even in Strict. Do not manufacture a conceptual decision for a trivial task. A small meaningful task usually needs one combined checkpoint; a substantial task needs several at real boundaries, not one per tool call. Reuse demonstrated understanding until the decision or its consequences change.
+Keep friction proportional. Skip checkpoints for mechanical formatting, literal text replacements, lookups, and agreed repetitive work, even in `strict`. Never invent a conceptual decision for a trivial edit. Reuse demonstrated understanding until the decision or its consequences change.
 
 ## Communication flags
 
-| Flag | Output behavior |
-|---|---|
-| `--normal` | Ordinary clear prose, with the detail the task needs. |
+| Flag | Style |
+| --- | --- |
+| `--normal` | Ordinary clear prose with the detail the task needs. |
 | `--compact` | Short sentences and paragraphs; essential facts first. |
-| `--caveman` | Very terse prose; fragments and familiar acronyms are acceptable. Remove filler, never necessary qualifiers. |
-| `--adaptive` | Start compact, generally within about 150 words per update or checkpoint. Expand when requested, when an answer reveals a misconception, or when accuracy requires it. This is a target, not a hard limit. |
+| `--terse` | Very terse prose; fragments and familiar acronyms are fine. Drop filler, keep qualifiers. Alias: `--caveman`. |
+| `--adaptive` | Start compact (around 150 words per update or checkpoint). Expand on request, after a misconception, or when accuracy needs it. |
 
-Compression reduces wording, not reasoning depth, evidence quality, uncertainty, or relevant tradeoffs. Preserve what changes, why, meaningful assumptions, consequences, and the user's decision. Use progressive disclosure: essential facts first, then a targeted explanation if needed. Offer supporting rationale and evidence, not private internal deliberation.
+- Shorter wording must preserve reasoning depth, evidence, uncertainty, and tradeoffs.
+- Keep checkpoint questions and the paused footer in clear, natural language, including under `--terse` or `--caveman`.
+- Preserve exact code, commands, errors, and identifiers, and match the user's language. Apply compression to conversation, not deliverables unless asked. Never load the separate Caveman skill.
 
-Questions always use natural, precise language, including in Caveman mode. Expand ambiguous compressed wording immediately. Preserve exact code, commands, errors, and technical names. Match the user's language. Apply compression to conversational explanations, not the content of code, documents, PR descriptions, or other deliverables unless requested. Implement this style here without depending on or activating the separate Caveman skill.
+## Boundaries, craft, and calibration
 
-## Choose meaningful boundaries
+Investigate available evidence first; never ask facts you can inspect yourself. Real triggers are ambiguous requirements, behavior or API changes, architecture, persistent data changes, security boundaries, material tradeoffs, unexpected failures that change the plan, and major new assumptions. Name the trigger; never imply the user is skimming or disengaged.
 
-Investigate available evidence first. Ask about understanding and judgment, not facts the agent can retrieve. Useful triggers include requirements interpretation, behavior or API changes, architecture, persistent data changes, security boundaries, material tradeoffs, unexpected failures that change the approach, and significant new assumptions. State the actual trigger; never infer that the user is skimming, disengaged, or cognitively impaired.
+- **Prepare first, ask once:** Finish all planned inspection, diagnostics, tests, and isolated drafts on disposable data before pausing, then ask the checkpoint question once at the end of the turn. Never ask mid-turn, run more tools, and re-ask it.
+- **Hold dependent work:** Production edits implementing an unresolved material decision and writes to the task's persistent data wait until the checkpoint resolves or is skipped, even when local, reversible, or uncommitted. Never cross a held boundary through another tool or background task.
+- **No echo questions:** Never ask a question whose answer appeared verbatim in the preceding explanation. Ask about applied consequences, failure modes, tradeoffs, or edge cases.
+- **Calibrate to experience:** When the user states invariants, failure modes, or exact domain terms, skip textbook basics and target blast radius, hidden assumptions, schema or API lock-in, edge cases, and tradeoffs found during inspection. When the user is learning the stack, translate jargon once in plain words, anchor questions in concrete task examples, and accept partial mental models before filling gaps.
 
-Finish enough discovery and preparation to make the decision concrete and reviewable before pausing. Existing user answers can satisfy alignment when they already demonstrate the relevant understanding. Do not ask the same question again because the skill was reinvoked.
-
-Preparation can include inspection, diagnostics, tests, and isolated drafts that do not change the task's production implementation or persistent data. Writing or replacing production code that embodies an unresolved material decision is dependent execution, even when the edit is local, reversible, uncommitted, or not yet deployed. Hold that edit as well as any dependent migration or deployment until the checkpoint is resolved or explicitly bypassed. Keep proposed patches or prototypes outside the production path; tests and draft experiments must use disposable data. For example, before resolving a migration decision, inspect the schema and test a draft on a temporary database, but hold changes to the application's migration implementation and its development database.
+For `strict` or `mentor`, read [references/checkpoints.md](references/checkpoints.md) when designing or evaluating a question.
 
 ## Run a checkpoint
 
-1. Briefly explain the concrete goal, proposed change, relevant reason, and material consequence or tradeoff. Ask one focused question. For Strict or Mentor, read [references/checkpoints.md](references/checkpoints.md) when selecting or evaluating a question.
-2. Name the boundary that is waiting and briefly explain that the selected Seatbelt mode calls for this check. Hold the action that depends on the answer, including production edits under the implementation boundary above. Independent discovery, diagnostics, tests, or isolated drafts may continue; reversibility alone does not make a dependent action preparation. Do not cross the boundary through a different tool or background task. If needed, yield with the question pending.
-3. In Strict or Mentor, accept an answer that captures the essential mechanism or consequence, in the user's own words; exact vocabulary is unnecessary. In multiple choice, a correct selection suffices when recognition is the chosen check. Confirm briefly and continue. For a consequential decision or uncertain recognition, choose teach-back instead of moving the goalposts after a correct answer.
-4. For an incomplete answer, ask one targeted follow-up. For a misconception, explain it kindly and reframe the question. "I don't know" prompts a short explanation or hint, not a penalty. After two unsuccessful attempts at the same checkpoint, offer explanation plus retry, a lower mode, or skipping this checkpoint. Do not retry endlessly or automatically declare success.
-5. At the handoff of substantial work in Standard, Strict, or Mentor, report the actual result and validation first, then explicitly resolve the handoff boundary. Reuse an earlier user answer only when it demonstrates understanding of the actual change and its relevant consequence, with no material change or newly discovered limitation left uncovered. Briefly identify what that answer already covered; no duplicate question is needed. An agent's explanation, a plain approval, or a skipped check is not demonstrated understanding. If coverage is missing, Standard asks for a brief interpretation or summary; Strict or Mentor requires a task-specific answer about the uncovered change or consequence. Mark that handoff check pending and yield. State that execution is finished and the handoff check remains; never misrepresent completed work or unrun checks. An explicit skip of this final check or a change to Off releases it; Lite requires no final comprehension check.
+1. **Explain and ask once:** After preparation finishes, briefly state the goal, proposed change, reason, and key tradeoff or consequence. Ask one focused question.
+2. **End with the two-control footer only (no policy citations):** Close every paused turn (initial check, follow-up, post-2-attempt pause, one-shot pause, or pending handoff) with one clean footer so final-message-only outputs always carry both controls:
+   ```text
+   Checkpoint (<mode>, <--flag>) | Paused before: <boundary>
+   ```
+   For a pending handoff after execution completes:
+   ```text
+   Checkpoint (<mode>, <--flag>) | Execution complete; handoff pending
+   ```
+   Let this footer alone mark the pause. Do not add a policy-justification line, do not quote Seatbelt rules, and do not link `SKILL.md` or any skill file path (for example, never write "Seatbelt requires..." or `[Seatbelt](.../SKILL.md)`). The only time a skill path may appear to the user is naming an unavailable reference file under the missing reference rule.
+3. **Show the reply cue once:** On the first checkpoint in a session and after any missed attempt, add:
+   `One sentence is enough. Reply "idk" for a hint, "explain", or "skip" to move on.`
+   Omit this cue on later checkpoints once seen.
+4. **Evaluate fairly:** Accept the essential mechanism or consequence in plain words; exact terminology is unnecessary. In multiple choice, a correct selection suffices; never mark an option "recommended", use a predictable slot, or reveal the answer early. Never treat a tool default, silence, or elapsed time as an answer.
+5. **Handle follow-ups without dead turns:**
+   - *Incomplete answer:* Ask one targeted follow-up.
+   - *Misconception:* Correct it kindly and reframe.
+   - *`"idk"`, `"I don't know"`, or `"hint"`:* Give a short hint or concrete anchor without penalty and ask a narrower version.
+   - *`"explain"`:* Unpack the mechanism clearly, then invite the user to state it in their own words right away, lower the mode, or skip.
+   - *After two unsuccessful attempts:* Explain the missed point clearly, then invite an immediate answer in the next reply, a lower mode (`standard` or `lite`), or `skip`. Never require a separate `"retry"` turn first, and never declare success automatically.
+6. **Close substantial handoffs by mode:** Report actual changes and verification first; never misrepresent completed work or unrun checks.
+   - `lite`: Done; no final check.
+   - `standard`: Close clean execution with a concise "what you now own" summary. Pause for a handoff question only if execution materially diverged or revealed a new risk or limitation.
+   - `strict`: If an earlier user answer already covers the change and its real consequences, state what it covered and close. Require a final check when the initial check was skipped, execution diverged, a real caveat appeared, or callers face an uncovered breaking change. Never invent hypothetical future trivia. An agent explanation, plain approval, or earlier skip is not demonstrated understanding.
+   - `mentor`: Close with a short debrief takeaway, or one reflection question if a key consequence remained uncovered.
 
-Use a supported question tool when suitable, otherwise ask in chat and yield. Never treat a tool's preselected option, silence, or elapsed time as an answer. For comprehension quizzes, avoid answer options marked "recommended" or any default that reveals the answer; use a free-text tool question or plain chat options if necessary.
-
-In a noninteractive or one-shot harness, when a checkpoint requires a reply that cannot arrive during the run, return the question, pending boundary, effective settings, and any completed independent work for a human to resume. Stop dependent execution at that boundary; do not fabricate an answer, wait indefinitely, or silently lower the mode. At a final handoff checkpoint, report completed execution and the remaining check separately. Explicit user instructions to skip a checkpoint or turn Seatbelt off still apply.
+In a one-shot or noninteractive run, stop dependent work at the boundary, report completed preparation, and end with the question and `Checkpoint (<mode>, <--flag>) | ...` footer (see [references/handoffs.md](references/handoffs.md)). Never fabricate an answer, wait indefinitely, or silently lower the mode.
 
 ## User agency and permissions
 
-The user may change modes or flags at any time, say "skip this checkpoint", or turn Seatbelt off. Honor an explicit skip without shaming or another confirmation; it skips only the current Seatbelt check. Continue the released work without immediately rephrasing the skipped question. A later substantial handoff is a separate boundary: assess it under step 5, and do not count the earlier skip as an answer or as a skip of the final check. A communication change alone does not release a pending check. A mode change reevaluates it under the new mode; Off releases it. A plain "go ahead" supplies authorization where appropriate but does not silently pass an active Strict comprehension check. A later explicit instruction to bypass the check does.
-
-Comprehension and permission are separate. Passing a question does not authorize deployment, deletion, messages, spending, or another external action; use the task's existing authorization rules. Conversely, selecting Strict explicitly requests these conversational pauses. Do not introduce Seatbelt quizzes merely because normal task approval is needed. Later user instructions and higher-priority constraints take precedence over this protocol.
+- Accept natural shortcuts at any time: `skip` (`skip this checkpoint`), `idk`, `hint`, `explain`, mode shifts (`lower to standard`, `switch to lite`), flag changes, `--handoff`, or `off`.
+- Honor `skip` without shaming or extra confirmation. It releases only the current check and supplies no understanding for a later handoff; continue without immediately re-asking it.
+- A communication change alone does not release a pending check; a mode change reevaluates it under the new mode; `off` releases it.
+- A plain "yes" or "go ahead" can supply task authorization where appropriate, but does not pass a pending `strict` or `mentor` check; an explicit bypass instruction does.
+- Comprehension and permission are separate. Passing a checkpoint never authorizes deployment, deletion, external messages, spending, or other gated actions. Later user instructions and higher-priority rules override this protocol.
