@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (0.2.0 draft)
+## 0.2.0 - 2026-11-25
 
 *Scripted v0.2.0 trials are recorded in [docs/trials/2026-11-25/README.md](docs/trials/2026-11-25/README.md) across Codex CLI `0.171.0` (`gpt-6-astra / high`) and Claude Code `2.1.330` (`claude-fable-5-2`). No human walkthroughs have been recorded on v0.2.0 yet.*
 
@@ -31,7 +31,7 @@
 - **Verified improvements (both hosts):** 0 duplicate mid-turn questions, 0 wasted retry turns, and 100% self-contained two-control footers in final messages (`B12` fixed on both Codex and Claude); updated `off` / `off --terse` (`B06`), standalone `--terse` / `--caveman` (`B08`), `B13` missing-reference disclosure, `mentor` pacing (`B14`), senior calibration (`B15`), multi-decision `standard` handoff summaries (`B16`), and `--handoff` + fresh-session resume (`B17`) all passed functional checks. Claude Code (`2.1.330`, `claude-fable-5-2`) passed all 19 turns with 0 automated UX findings.
 - **Known limitation (Codex policy citations):** `codex-cli 0.171.0` (`gpt-6-astra / high`) still intermittently added a `[Seatbelt](.../SKILL.md)` link and quoted rule line before the paused footer (2 of 3 spot-check turns on the final wording, down from 14/17 on the earlier candidate; `B12-final-footer` ran with 0 findings).
 - **Known nuance (Claude `B15`):** When the user prompt supplied every implementation detail of `migrate(connection)` up front, Claude wrote `app/migration.py` and tests in Turn 1 while holding `data/users.sqlite3` and `app/users.py` at the unresolved caller boundary.
-- **Coverage limits:** Scripted controller turns only (no v0.2.0 human walkthroughs yet); `B13` for a missing `references/handoffs.md` remains untested; Codex Cohort 1 hit 6 CLI stream timeouts under concurrency (0 timeouts in sequential retries and the spot check). See [docs/trials/2026-11-25/README.md](docs/trials/2026-11-25/README.md).
+- **Coverage limits:** Scripted controller turns only (no v0.2.0 human walkthroughs yet); `B13` for a missing `references/handoffs.md` remains untested; Codex Cohort 1 hit 6 CLI stream timeouts under concurrency (0 timeouts in sequential retries and the spot check). See [docs/trials/2026-11-25/README.md](docs/trials/2026-11-25/README.md). The [v0.2.0 release](https://github.com/LunarianDev/cognitive-seatbelt/releases/tag/v0.2.0) includes the installable skill archive and checksum.
 
 ## 0.1.0 - 2026-11-04
 

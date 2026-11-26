@@ -1,8 +1,8 @@
 # Recorded v0.2.0 trials, November 25, 2026
 
-These local Codex CLI and Claude Code trials exercise the v0.2.0 UX overhaul on `dev/v0.2.0` (built off `da6646a`). They test the updated `off` reset rule, `--terse` and its `--caveman` alias, self-contained final-message footers (`B12`), missing-reference disclosure (`B13`), `mentor` pacing and no-wasted-retry flow (`B14`), experienced-user calibration (`B15`), multi-decision webhook tasks and `standard` handoff summaries (`B16`), `--handoff` plus fresh-session resume (`B17`), and automated UX hygiene (`B18`).
+These local Codex CLI and Claude Code trials exercise the v0.2.0 UX overhaul merged into `main` in [PR #2](https://github.com/LunarianDev/cognitive-seatbelt/pull/2) (built off `da6646a`). They test the updated `off` reset rule, `--terse` and its `--caveman` alias, self-contained final-message footers (`B12`), missing-reference disclosure (`B13`), `mentor` pacing and no-wasted-retry flow (`B14`), experienced-user calibration (`B15`), multi-decision webhook tasks and `standard` handoff summaries (`B16`), `--handoff` plus fresh-session resume (`B17`), and automated UX hygiene (`B18`).
 
-All follow-up replies in these trials were scripted by controller harnesses; no human walkthroughs have been recorded on v0.2.0 yet. These are small observed samples, not general reliability guarantees or proof of learning gains. Historical v0.1.0 evidence remains frozen under [docs/trials/2026-11-04/](../2026-11-04/README.md).
+All follow-up replies in these trials were scripted by controller harnesses; no human walkthroughs have been recorded on v0.2.0 yet. These are small observed samples, not general reliability guarantees or proof of learning gains. Publication status and packaged files are recorded on the [v0.2.0 release page](https://github.com/LunarianDev/cognitive-seatbelt/releases/tag/v0.2.0). Historical v0.1.0 evidence remains frozen under [docs/trials/2026-11-04/](../2026-11-04/README.md).
 
 ## Tested configurations
 
